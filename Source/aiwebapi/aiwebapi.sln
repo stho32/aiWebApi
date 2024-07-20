@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aiwebapi.BL", "aiwebapi.BL\aiwebapi.BL.csproj", "{0BFAF622-1656-4FAF-AC4B-57B7E301569C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aiwebapi.BL.Tests", "aiwebapi.BL.Tests\aiwebapi.BL.Tests.csproj", "{B26E08DF-F06A-4032-9BA5-13D22DB15600}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0BFAF622-1656-4FAF-AC4B-57B7E301569C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BFAF622-1656-4FAF-AC4B-57B7E301569C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BFAF622-1656-4FAF-AC4B-57B7E301569C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BFAF622-1656-4FAF-AC4B-57B7E301569C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B26E08DF-F06A-4032-9BA5-13D22DB15600}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B26E08DF-F06A-4032-9BA5-13D22DB15600}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B26E08DF-F06A-4032-9BA5-13D22DB15600}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B26E08DF-F06A-4032-9BA5-13D22DB15600}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
