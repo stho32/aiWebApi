@@ -1,4 +1,4 @@
-﻿namespace aiwebapi.BL;
+﻿namespace aiwebapi.BL.shared;
 
 public interface ILlmModel
 {
