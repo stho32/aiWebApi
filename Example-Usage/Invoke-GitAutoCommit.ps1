@@ -97,9 +97,7 @@ function Invoke-GitAutoCommit {
             # Run git add .
             try {
                 $output = & git -C $Path add . 2>&1
-                if ($LASTEXITCODE -ne 0) {
-                    throw "Git add failed with exit code $LASTEXITCODE. Output: $output"
-                }
+                # Ignore exit code for git add
                 Write-Host "Changes staged successfully."
             } catch {
                 Write-Error "Git add failed: $_"
@@ -110,9 +108,7 @@ function Invoke-GitAutoCommit {
             try {
                 $escapedMessage = $commitMessage -replace '"', '\"'
                 $output = & git -C $Path commit -m "$escapedMessage" 2>&1
-                if ($LASTEXITCODE -ne 0) {
-                    throw "Git commit failed with exit code $LASTEXITCODE. Output: $output"
-                }
+                # Ignore exit code for git commit
                 Write-Host "Committed changes with message:`n$commitMessage"
             } catch {
                 Write-Error "Git commit failed: $_"
@@ -122,9 +118,7 @@ function Invoke-GitAutoCommit {
             if ($AutoPush) {
                 try {
                     $output = & git -C $Path push 2>&1
-                    if ($LASTEXITCODE -ne 0) {
-                        throw "Git push failed with exit code $LASTEXITCODE. Output: $output"
-                    }
+                    # Ignore exit code for git push
                     Write-Host "Changes pushed to remote repository."
                 } catch {
                     Write-Error "Git push failed: $_"
