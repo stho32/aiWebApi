@@ -53,5 +53,3 @@ app.MapPost("/query", async (QueryRequest request, ILlmModelCollection modelColl
 .WithOpenApi();
 
 app.Run();
-
-public record QueryRequest(string ModelName, string Prompt);

@@ -1,0 +1,1 @@
+﻿public record QueryRequest(string ModelName, string Prompt);
