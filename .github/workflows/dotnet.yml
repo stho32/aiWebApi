@@ -1,0 +1,85 @@
+name: .NET CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  DOTNET_VERSION: "8.0.x"
+  SOLUTION_DIR: "Source/aiwebapi"
+  PROJECT: "./aiwebapi.webapi/aiwebapi.webapi.csproj"
+  RELEASEPREFIX: "aiwebapi"
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: ${{ env.SOLUTION_DIR }}
+    
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      working-directory: ${{ env.SOLUTION_DIR }}
+    
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
+      working-directory: ${{ env.SOLUTION_DIR }}
+    
+    - name: Publish
+      run: dotnet publish ${{ env.PROJECT }} -c Release -o ${{ env.RELEASEPREFIX }}-win-x64 -p:PublishReadyToRun=true --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:UseAppHost=true -r win-x64
+      working-directory: ${{ env.SOLUTION_DIR }}
+    
+    - name: Zip Published Files
+      run: Compress-Archive -Path ${{ env.RELEASEPREFIX }}-win-x64 -DestinationPath ${{ env.RELEASEPREFIX }}-win-x64.zip
+      working-directory: ${{ env.SOLUTION_DIR }}
+    
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ env.RELEASEPREFIX }}-win-x64
+        path: ${{ env.SOLUTION_DIR }}/${{ env.RELEASEPREFIX }}-win-x64.zip
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Download Artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ env.RELEASEPREFIX }}-win-x64
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release ${{ github.run_number }}
+        draft: false
+        prerelease: false
+    
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ env.RELEASEPREFIX }}-win-x64.zip
+        asset_name: ${{ env.RELEASEPREFIX }}-win-x64.zip
+        asset_content_type: application/zip
