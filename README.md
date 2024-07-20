@@ -1,32 +1,51 @@
-# .NET 6 App Repository Template
+# AI Web API Project
 
-This project template is designed for .NET 8 applications.
+A .NET 8 application providing an API for interacting with AI models, primarily Anthropic's Claude API.
 
-## Badges
+## Features
 
-- [ ] Add a badge from the build workflow
+- Endpoint for querying AI models
+- Multi-model support (Claude 3.5 Sonnet and Echo model)
+- OpenAPI/Swagger documentation
+- GitHub Actions CI/CD workflow
+- PowerShell script for AI-generated Git commits
 
-## What is this?
+## Prerequisites
 
-This is a template repository for creating .NET 8 applications with a predefined structure and workflow. It includes:
+- .NET 8 SDK
+- Anthropic API key
 
-- A solution structure with separate projects for business logic and unit tests
-- GitHub Actions workflow for building, testing, and publishing
-- Scripts for creating new projects and running tests with code coverage
-- MIT License
+## Setup
 
-### Features
+1. Clone the repository
+2. Set environment variable: `ANTHROPIC_API_KEY="your-api-key"`
+3. Navigate to `Source/aiwebapi`
+4. Run: `dotnet restore` and `dotnet run --project aiwebapi.webapi`
 
-- Automated project creation with `New-Project.ps1`
-- Cross-platform support (Windows and Linux)
-- Integrated unit testing with NUnit
-- Code coverage reporting
-- Continuous Integration/Continuous Deployment (CI/CD) setup with GitHub Actions
+## API Endpoints
 
-### Getting Started
+- GET /models: List available AI models
+- POST /query: Send prompt to specified AI model
 
-1. Clone this repository
-2. Run the `New-Project.ps1` script to create a new project:
-   ```
-   .\New-Project.ps1 -ProjectName YourProjectName
-   ```
+Explore via Swagger UI: `https://localhost:5001/swagger`
+
+## Automated Git Commits
+
+Use the PowerShell script for AI-generated commit messages:
+
+```powershell
+.\Example-Usage\Invoke-GitAutoCommit.ps1
+```
+
+## Project Structure
+
+```
+Source/aiwebapi/
+├── aiwebapi.BL/             # Business Logic
+├── aiwebapi.BL.Tests/       # Unit tests
+└── aiwebapi.webapi/         # Web API
+```
+
+## License
+
+MIT License

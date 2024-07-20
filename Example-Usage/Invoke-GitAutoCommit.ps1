@@ -73,6 +73,21 @@ function Invoke-GitAutoCommit {
             return
         }
 
+        # Encode the git diff to ensure it's valid UTF-8
+        $encodedDiff = [System.Text.Encoding]::UTF8.GetBytes($gitDiff)
+        $encodedDiffBase64 = [System.Convert]::ToBase64String($encodedDiff)
+
+        # Prepare the request body
+        $body = @{
+            ModelName = $ModelName
+            Messages = @(
+                @{
+                    role = "user"
+                    content = "Please create me a good short commit message for the following git diff (base64 encoded). Give me only the commit message and NOTHING else. Just a main message and then a few main points what the changes have been in bullet points. I want to use your complete output as commit message. Here's the base64 encoded git diff: $encodedDiffBase64"
+                }
+            )
+        }
+
         # Prepare the request body
         $body = @{
             ModelName = $ModelName
@@ -80,10 +95,13 @@ function Invoke-GitAutoCommit {
             Give me only the commit message and NOTHING else.
             Just a main message and then a few main points what the changes have been in bullet points.
             I want to use your complete output as commit message.
+            The git diff is in base64.
             
-            `n$gitDiff
+            `n$encodedDiffBase64
             "
         } | ConvertTo-Json
+
+        Write-Verbose $body 
 
         # Make the API call
         $response = Invoke-RestMethod -Uri $ApiUrl -Method Post -Body $body -ContentType "application/json"
