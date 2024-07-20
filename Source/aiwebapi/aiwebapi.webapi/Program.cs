@@ -1,4 +1,5 @@
-using aiwebapi.webapi;
+using aiwebapi.BL;
+using aiwebapi.BL.shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add LlmModelCollection as a singleton
+string? anthropicApiKey = Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY");
+if (string.IsNullOrEmpty(anthropicApiKey))
+{
+    Console.WriteLine("Warning: ANTHROPIC_API_KEY environment variable is not set.");
+}
+builder.Services.AddSingleton(LlmModelCollectionFactory.Create(anthropicApiKey ?? string.Empty));
 
 var app = builder.Build();
 
@@ -18,24 +27,31 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+// List available models
+app.MapGet("/models", (ILlmModelCollection modelCollection) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    var models = modelCollection.ListModels().Select(m => new { m.ModelName, m.Provider });
+    return Results.Ok(models);
+})
+.WithName("ListModels")
+.WithOpenApi();
 
-app.MapGet("/weatherforecast", () =>
+// Query a specific model
+app.MapPost("/query", async (QueryRequest request, ILlmModelCollection modelCollection) =>
+{
+    try
     {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast")
-    .WithOpenApi();
+        var response = await modelCollection.QueryAsync(request.ModelName, request.Prompt);
+        return Results.Ok(new { Response = response });
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.BadRequest(new { Error = ex.Message });
+    }
+})
+.WithName("QueryModel")
+.WithOpenApi();
 
 app.Run();
+
+public record QueryRequest(string ModelName, string Prompt);
