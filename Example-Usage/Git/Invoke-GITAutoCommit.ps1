@@ -74,7 +74,7 @@
                         try {
                             $escapedMessage = $commitMessage -replace '"', '\"'
                             $null = & git -C $Path commit -m "$escapedMessage" 2>&1
-                            Write-Host "Committed changes with message:`n$commitMessage"
+                            Write-Host "Committed changes!"
                         } catch {
                             # Ignore the error and continue
                         }
