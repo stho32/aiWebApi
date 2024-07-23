@@ -8,10 +8,12 @@
         [switch]$TestMode,
 
         [Parameter(Mandatory=$false)]
-        [switch]$AutoPush,
+        [ValidateSet("Anthropic", "OpenAI", "WebAPI")]
+        [string]$AIProvider = "WebAPI",
 
         [Parameter(Mandatory=$false)]
-        [switch]$UseAnthropicDirect
+        [switch]$AutoPush
+
     )
 
     # Save the current ErrorActionPreference
@@ -40,11 +42,7 @@
         
         `n$encodedDiffBase64"
 
-        if ($UseAnthropicDirect) {
-            $commitMessage = Invoke-AIAnthropics -Prompt $prompt
-        } else {
-            $commitMessage = Invoke-AIWebApi -Prompt $prompt
-        }
+        $commitMessage = Invoke-AI -Provider $AIProvider -Prompt $prompt
 
         if ($null -eq $commitMessage) {
             Write-Error "Failed to generate commit message"
@@ -87,5 +85,33 @@
     finally {
         # Restore the original ErrorActionPreference
         $ErrorActionPreference = $oldErrorActionPreference
+    }
+}
+
+function Invoke-AI {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateSet("Anthropic", "OpenAI", "WebAPI")]
+        [string]$Provider,
+
+        [Parameter(Mandatory=$true)]
+        [string]$Prompt
+    )
+
+    switch ($Provider) {
+        "Anthropic" {
+            # Implement Anthropic AI call here
+            throw "Anthropic AI provider not implemented yet"
+        }
+        "OpenAI" {
+            return Invoke-OpenAI -Prompt $Prompt
+        }
+        "WebAPI" {
+            return Invoke-AIWebApi -Prompt $Prompt
+        }
+        default {
+            throw "Invalid AI provider specified"
+        }
     }
 }
