@@ -7,7 +7,7 @@ function Invoke-OpenAI {
             "gpt-4",
             "gpt-4o"
         )]
-        [string]$ModelName = "gpt-4-turbo",
+        [string]$ModelName = "gpt-4o",
         
         [Parameter(Mandatory=$true)]
         [string]$Prompt,
