@@ -8,13 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add LlmModelCollection as a singleton
-string? anthropicApiKey = Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY");
-if (string.IsNullOrEmpty(anthropicApiKey))
+var apiKeys = new Dictionary<string, string>
 {
-    Console.WriteLine("Warning: ANTHROPIC_API_KEY environment variable is not set.");
-}
-builder.Services.AddSingleton(LlmModelCollectionFactory.Create(anthropicApiKey ?? string.Empty));
+    { "Sonnet35", Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY") ?? string.Empty },
+    { "Gpt4o", Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? string.Empty }
+};
+
+builder.Services.AddSingleton(LlmModelCollectionFactory.Create(apiKeys));
 
 var app = builder.Build();
 
