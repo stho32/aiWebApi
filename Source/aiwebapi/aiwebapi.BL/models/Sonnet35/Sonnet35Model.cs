@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net;
+using System.Net.Http.Json;
 using aiwebapi.BL.shared;
 
 namespace aiwebapi.BL.models.Sonnet35;
@@ -24,14 +25,21 @@ public class Sonnet35Model : ILlmModel
         var request = new AnthropicRequest
         {
             Model = InternalModelName,
-            Messages = new[]
-            {
+            Messages =
+            [
                 new Message { Role = "user", Content = prompt }
-            },
+            ],
             MaxTokens = 1024
         };
 
-        var response = await _httpClient.PostAsJsonAsync(ApiUrl, request);
+        HttpResponseMessage response = await _httpClient.PostAsJsonAsync(ApiUrl, request);
+
+        // Retry logic if the Response was HttpError 529.
+        if (response.StatusCode == (HttpStatusCode)529)
+        {
+            response = await _httpClient.PostAsJsonAsync(ApiUrl, request);
+        }
+
         response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadFromJsonAsync<AnthropicResponse>();
